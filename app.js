@@ -84,7 +84,7 @@ function change(event) {
   });
 }
 
-//displaying day
+//displaying days
 days.map((day) => {
   let li = document.createElement("li");
   li.textContent = day;
@@ -92,6 +92,8 @@ days.map((day) => {
   li.setAttribute("onclick", `change(${day})`);
   li.classList.add("font-mono");
   if (li.textContent == today) {
+    
+
     li.classList.add(
       "snap-center",
       "p-2",
@@ -99,6 +101,10 @@ days.map((day) => {
       "underline",
       "underline-offset-6"
     );
+
+    document.addEventListener("DOMContentLoaded", function () {
+        li.scrollIntoView({behavior: "smooth", inline : "center"})
+    });
   }
 
   if (li.textContent < today) {
@@ -189,7 +195,7 @@ continueBtn.addEventListener("click", (event) => {
   }
 });
 
-console.log(timeDisplay)
+console.log(timeDisplay);
 
 time.addEventListener("click", () => {
   timeContainer.classList.toggle("hidden");
@@ -198,20 +204,20 @@ time.addEventListener("click", () => {
 addItem.addEventListener("click", () => {
   newObj = { day: today, todo: inp.value, time: timeDisplay };
   inp.value = "";
-  time.textContent = "time"
+  time.textContent = "time";
   todoObj.push(newObj);
 
   let div = document.createElement("div");
   let em;
   emojis.map((emoji) => {
     if (newObj.todo.includes(emoji)) {
-        em = emoji;
-    }else {
-        em = ""
+      em = emoji;
+    } else {
+      em = "";
     }
   });
 
-  console.log(em)
+  console.log(em);
 
   div.innerHTML = `<div
           class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
@@ -226,7 +232,9 @@ addItem.addEventListener("click", () => {
           </div>
         </div>`;
 
-   if(newObj.todo)  {
+  if (newObj.todo) {
     todoContainer.appendChild(div);
-   }
+  }
+
+  timeDisplay = "";
 });
