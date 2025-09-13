@@ -73,7 +73,8 @@ function change(event) {
     list.classList.remove("underline", "snap-center");
 
     if (list.value == event) {
-      list.classList.add("underline", "snap-center", "underline-offset-6");
+      list.classList.add("underline", "underline-offset-6");
+      list.scrollIntoView({behavior: "smooth", inline: "center"})
       currentDay = new Date(2025, monthInNum - 1, event).toLocaleString(
         "default",
         { weekday: window.screen.width < "768" ? "short" : "long" }
