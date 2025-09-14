@@ -2,7 +2,6 @@ const inp = document.getElementById("input");
 const btn = document.getElementById("btn");
 const ul = document.querySelector("ul");
 const div = document.getElementById("month");
-const checkbox = document.getElementById("check-box");
 const h1 = document.getElementById("day");
 const hour = document.getElementById("hour");
 const minute = document.getElementById("minute");
@@ -12,8 +11,9 @@ const continueBtn = document.getElementById("continue");
 const timeContainer = document.getElementById("time-container");
 const addItem = document.getElementById("add-item");
 const todoContainer = document.getElementById("todo-container");
+const emojiBox = document.getElementById("emoji-box");
 
-let emojis = ["fruit", "vegetables", "wake", "sleep", "meat", "drink"];
+let emojis = ["fruit", "vegetables", "wake", "sleep", "meat", "drink", "wake"];
 
 // for dates
 
@@ -27,7 +27,7 @@ let newObj = {};
 let timeHour,
   timeMinute,
   timePeriod,
-  timeDisplay = "time";
+  timeDisplay = "";
 
 let date = new Date();
 let currentMonth = date.toLocaleString("default", { month: "numeric" });
@@ -73,9 +73,9 @@ function change(event) {
     list.classList.remove("underline", "snap-center");
 
     if (list.value == event) {
-      list.scrollIntoView({behavior: "smooth", inline: "center"})
+      list.scrollIntoView({ behavior: "smooth", inline: "center" });
       list.classList.add("underline", "snap-center", "underline-offset-6");
-      
+
       currentDay = new Date(2025, monthInNum - 1, event).toLocaleString(
         "default",
         { weekday: window.screen.width < "768" ? "short" : "long" }
@@ -94,8 +94,6 @@ days.map((day) => {
   li.setAttribute("onclick", `change(${day})`);
   li.classList.add("font-mono");
   if (li.textContent == today) {
-    
-
     li.classList.add(
       "snap-center",
       "p-2",
@@ -105,7 +103,7 @@ days.map((day) => {
     );
 
     document.addEventListener("DOMContentLoaded", function () {
-        li.scrollIntoView({behavior: "smooth", inline : "center"})
+      li.scrollIntoView({ behavior: "smooth", inline: "center" });
     });
   }
 
@@ -124,12 +122,12 @@ inp.addEventListener("keyup", (event) => {
 
   emojis.map((emoji) => {
     if (inp.value.includes(emoji)) {
-      checkbox.classList.remove("hidden");
-      checkbox.classList.remove("border-1");
+      emojiBox.classList.remove("hidden");
+      emojiBox.classList.remove("border-1");
       img.setAttribute("src", `assets/${emoji}.png`);
-      checkbox.appendChild(img);
+      emojiBox.appendChild(img);
     } else if (!inp.value) {
-      checkbox.classList.add("hidden");
+      emojiBox.classList.add("hidden");
     }
   });
 });
@@ -197,7 +195,6 @@ continueBtn.addEventListener("click", (event) => {
   }
 });
 
-console.log(timeDisplay);
 
 time.addEventListener("click", () => {
   timeContainer.classList.toggle("hidden");
@@ -210,22 +207,15 @@ addItem.addEventListener("click", () => {
   todoObj.push(newObj);
 
   let div = document.createElement("div");
-  let em;
-  emojis.map((emoji) => {
+
+  const emoji = emojis.map((emoji) => {
     if (newObj.todo.includes(emoji)) {
-      em = emoji;
-    } else {
-      em = "";
-    }
-  });
-
-  console.log(em);
-
-  div.innerHTML = `<div
+      console.log(emoji);
+      div.innerHTML = `<div
           class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
         >
-          <div class="flex gap-5 items-center">
-            <img src="assets/${em ? em : "fruit"}.png" alt="" class="w-7" />
+          <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
+            <img src="assets/${emoji}.png" alt="" class="w-5" />
             <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
           </div>
 
@@ -234,9 +224,39 @@ addItem.addEventListener("click", () => {
           </div>
         </div>`;
 
-  if (newObj.todo) {
-    todoContainer.appendChild(div);
+      return true;
+    }
+
+    return false;
+  });
+
+  if (!emoji.some((element) => element === true)) {
+    div.innerHTML = `<div
+          class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
+        >
+          <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
+            <button class="w-5 h-5 border-1 rounded-sm border-gray-300" value="${newObj.todo}" ></button> 
+            <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
+          </div>
+
+          <div class="flex gap-3 items-center">
+            <p class="md:text-2xl opacity-40 font-mono">${newObj.time}</p>
+          </div>
+        </div>`;
   }
 
+  if (newObj.todo) todoContainer.appendChild(div);
+
   timeDisplay = "";
+  console.log(todoObj)
 });
+
+
+function handleCheckBox(element) {
+
+  if(element.children[0].tagName === "BUTTON") {
+    element.children[0].classList.toggle("bg-gray-800")
+  }
+  element.children[1].classList.toggle("line-through")
+  element.children[1].classList.toggle("decoration-1")
+}
