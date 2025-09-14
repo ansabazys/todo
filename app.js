@@ -21,8 +21,9 @@ let days = [];
 let hours = [];
 let minutes = [];
 let periods = ["AM", "PM"];
-let todoObj = [];
+let todoLists = [];
 let newObj = {};
+let state = true;
 
 let timeHour,
   timeMinute,
@@ -195,68 +196,146 @@ continueBtn.addEventListener("click", (event) => {
   }
 });
 
-
 time.addEventListener("click", () => {
   timeContainer.classList.toggle("hidden");
 });
 
 addItem.addEventListener("click", () => {
-  newObj = { day: today, todo: inp.value, time: timeDisplay };
+  newObj = {
+    id: Math.random(),
+    day: today,
+    todo: inp.value,
+    time: timeDisplay,
+  };
   inp.value = "";
   time.textContent = "time";
-  todoObj.push(newObj);
+  todoLists.push(newObj);
+  
+  
 
-  let div = document.createElement("div");
+  // let div = document.createElement("div");
 
-  const emoji = emojis.map((emoji) => {
-    if (newObj.todo.toLowerCase().includes(emoji)) {
-      console.log(emoji);
-      div.innerHTML = `<div
-          class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
-        >
-          <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
-            <img src="assets/${emoji}.png" alt="" class="w-5" />
-            <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
-          </div>
+  // const emoji = emojis.map((emoji) => {
+  //   if (newObj.todo.toLowerCase().includes(emoji)) {
+  //     console.log(emoji);
+  //     div.innerHTML = `<div
+  //         class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
+  //       >
+  //         <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
+  //           <img src="assets/${emoji}.png" alt="" class="w-7" />
+  //           <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
+  //         </div>
 
-          <div class="flex gap-3 items-center">
-            <p class="md:text-2xl opacity-40 font-mono">${newObj.time}</p>
-          </div>
-        </div>`;
+  //         <div class="flex gap-3 items-center">
+  //           <p class="md:text-2xl opacity-40 font-mono" onclick="handleDelete(this)" value="${newObj.todo}"><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></p>
+  //         </div>
+  //       </div>`;
 
-      return true;
-    }
+  //     return true;
+  //   }
 
-    return false;
-  });
+  //   return false;
+  // });
 
-  if (!emoji.some((element) => element === true)) {
-    div.innerHTML = `<div
-          class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
-        >
-          <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
-            <button class="w-5 h-5 border-1 rounded-sm border-gray-300" value="${newObj.todo}" ></button> 
-            <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
-          </div>
+  // if (!emoji.some((element) => element === true)) {
+  //   div.innerHTML = `<div
+  //         class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
+  //       >
+  //         <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
+  //         <div class="w-7 flex justify-center">
+  //           <button class="w-5 h-5 border-1 rounded-sm border-gray-300" value="${newObj.todo}" ></button>
+  //            </div>
+  //           <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
 
-          <div class="flex gap-3 items-center">
-            <p class="md:text-2xl opacity-40 font-mono">${newObj.time}</p>
-          </div>
-        </div>`;
+  //         </div>
+
+  //         <div class="flex gap-3 items-center">
+  //           <p class="md:text-2xl opacity-40 font-mono" onclick="handleDelete(this)" value="${newObj.todo}"><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></p>
+  //         </div>
+  //       </div>`;
+  // }
+
+  if (newObj.todo) {
+    localStorage.setItem("todo", JSON.stringify(todoLists));
   }
 
-  if (newObj.todo) todoContainer.appendChild(div);
-
+  todoContainer.replaceChildren();
+  fetchList();
+  
   timeDisplay = "";
-  console.log(todoObj)
 });
 
-
 function handleCheckBox(element) {
-
-  if(element.children[0].tagName === "BUTTON") {
-    element.children[0].classList.toggle("bg-gray-800")
+  if (element.children[0].children[0]?.tagName === "BUTTON") {
+    element.children[0].children[0].classList.toggle("bg-green-700");
+    element.children[0].children[0].classList.toggle("border-green-200");
   }
-  element.children[1].classList.toggle("line-through")
-  element.children[1].classList.toggle("decoration-1")
+  element.children[1].classList.toggle("line-through");
+  element.children[1].classList.toggle("decoration-1");
+}
+
+function fetchList() {
+  let getLists = JSON.parse(localStorage.getItem("todo"));
+  if (getLists) {
+    todoLists = getLists ? getLists : todoLists;
+
+    todoLists.map((list) => {
+      let div = document.createElement("div");
+      const emoji = emojis.map((emoji) => {
+        if (list.todo?.toLowerCase().includes(emoji)) {
+          div.innerHTML = `<div
+          class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
+        >
+          <div class="flex md:gap-5 gap-3 items-center cursor-pointer" data-index-number="${list.id}" onclick="handleCheckBox(this)">
+            <img src="assets/${emoji}.png" alt="" class="w-7" />
+            <p class="text-xl md:text-2xl font-mono">${list.todo}</p>
+          </div>
+
+          <div class="flex gap-3 items-center">
+            <button class="md:text-2xl opacity-40 font-mono" data-index-number="${list.id}" onclick="handleDelete(this)" ><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></button>
+          </div>
+        </div>`;
+
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!emoji.some((element) => element === true)) {
+        div.innerHTML = `<div
+          class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
+        >
+          <div class="flex md:gap-5 gap-3 items-center cursor-pointer" data-index-number="${list.id}" onclick="handleCheckBox(this)">
+          <div class="w-7 flex justify-center">
+            <button class="w-5 h-5 border-2 rounded-full border-gray-300" value="${list.todo}" ></button> 
+            </div>
+            <p class="text-xl md:text-2xl font-mono">${list.todo}</p>
+          </div>
+
+          <div class="flex gap-3 items-center">
+            <button class="md:text-2xl opacity-40 font-mono" data-index-number="${list.id}" onclick="handleDelete(this)" ><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></button>
+          </div>
+        </div>`;
+      }
+
+      if (todoLists) {
+        todoContainer.appendChild(div);
+      }
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", fetchList());
+
+function handleDelete(element) {
+  let newLists = todoLists.filter((li) => li.id != element.dataset.indexNumber);
+  if (newLists.length >= 0) {
+    localStorage.setItem("todo", JSON.stringify(newLists));
+  } else {
+    localStorage.removeItem("todo");
+  }
+
+  todoContainer.replaceChildren();
+  fetchList();
 }
