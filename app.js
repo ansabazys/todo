@@ -121,7 +121,7 @@ inp.addEventListener("keyup", (event) => {
   }
 
   emojis.map((emoji) => {
-    if (inp.value.includes(emoji)) {
+    if (inp.value.toLowerCase().includes(emoji)) {
       emojiBox.classList.remove("hidden");
       emojiBox.classList.remove("border-1");
       img.setAttribute("src", `assets/${emoji}.png`);
@@ -209,7 +209,7 @@ addItem.addEventListener("click", () => {
   let div = document.createElement("div");
 
   const emoji = emojis.map((emoji) => {
-    if (newObj.todo.includes(emoji)) {
+    if (newObj.todo.toLowerCase().includes(emoji)) {
       console.log(emoji);
       div.innerHTML = `<div
           class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
