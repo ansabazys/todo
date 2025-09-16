@@ -83,23 +83,22 @@ function change(event) {
         { weekday: window.screen.width < "768" ? "short" : "long" }
       );
       h1.textContent = currentDay;
-      
     }
   });
 
-  console.log(today)
-  
-  todoLists.map(list => {
-    if(list.day === today) {
-      fetchList()
-    }else {
-      displayNone()
+  console.log(today);
+
+  todoLists.map((list) => {
+    if (list.day === today) {
+      fetchList();
+    } else {
+      displayNone();
     }
-  })
+  });
 }
 
 function displayNone() {
-  console.log("displaying none")
+  console.log("displaying none");
 }
 
 //displaying days
@@ -221,6 +220,7 @@ addItem.addEventListener("click", () => {
     day: today,
     todo: inp.value,
     time: timeDisplay,
+    isComplete: false,
   };
   inp.value = "";
   time.textContent = "time";
@@ -278,25 +278,53 @@ addItem.addEventListener("click", () => {
   timeDisplay = "";
 });
 
+
+
 function handleCheckBox(element) {
-  if (element.children[0].children[0]?.tagName === "BUTTON") {
-    element.children[0].children[0].classList.toggle("bg-green-700");
-    element.children[0].children[0].classList.toggle("border-green-200");
-  }
-  element.children[1].classList.toggle("line-through");
-  element.children[1].classList.toggle("decoration-1");
+  let newLists = todoLists.map((list) => {
+    if (list.id == element.dataset.indexNumber) {
+      let state = list.isComplete;
+
+      if (!state && element.children[0].children[0]?.tagName === "BUTTON") {
+        element.children[0].children[0].classList.remove("bg-white");
+        element.children[0].children[0].classList.add("bg-green-700");
+        element.children[0].children[0].classList.add("border-green-200");
+      }else {
+        element.children[0].children[0].classList.remove("bg-green-700");
+        element.children[0].children[0].classList.remove("border-green-200");
+      }
+      element.children[1].classList.toggle("line-through");
+      element.children[1].classList.toggle("decoration-1");
+
+      if (state) {
+        state = false;
+      } else {
+        state = true;
+      }
+      return { ...list, isComplete: state };
+    }
+    return list;
+  });
+
+  updateLocalStorage(newLists);
+  let getLists = JSON.parse(localStorage.getItem("todo"));
+  todoLists = getLists ? getLists : todoLists;
+}
+
+function updateLocalStorage(value) {
+  localStorage.setItem("todo", JSON.stringify(value));
 }
 
 function fetchList() {
-  let getLists = JSON.parse(localStorage.getItem("todo"))
-  
-  todoLists = getLists ? getLists : todoLists
+  let getLists = JSON.parse(localStorage.getItem("todo"));
 
-  displayList()
- 
+  todoLists = getLists ? getLists : todoLists;
+
+  displayList();
 }
 
 function displayList() {
+  console.log(todoLists)
   todoLists.map((list) => {
     let div = document.createElement("div");
     const emoji = emojis.map((emoji) => {
@@ -326,9 +354,9 @@ function displayList() {
         >
           <div class="flex md:gap-5 gap-3 items-center cursor-pointer" data-index-number="${list.id}" onclick="handleCheckBox(this)">
           <div class="w-7 flex justify-center">
-            <button class="w-5 h-5 border-2 rounded-full border-gray-300" value="${list.todo}" ></button> 
+            <button class="w-5 h-5 border-2 rounded-full ${list.isComplete ? `bg-green-700` : `bg-white`} border-gray-300" value="${list.todo}" ></button> 
             </div>
-            <p class="text-xl md:text-2xl font-mono">${list.todo}</p>
+            <p class="text-xl md:text-2xl ${list.isComplete ? `line-through` : `no-underline`} font-mono">${list.todo}</p>
           </div>
 
           <div class="flex gap-3 items-center">
@@ -338,7 +366,6 @@ function displayList() {
     }
 
     if (list.day === today) {
-      console.log(list);
     }
     if (todoLists) todoContainer.appendChild(div);
   });
