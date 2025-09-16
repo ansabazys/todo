@@ -287,15 +287,13 @@ function handleCheckBox(element) {
         element.children[0].children[0].classList.remove("bg-white");
         element.children[0].children[0].classList.add("bg-green-700");
         element.children[0].children[0].classList.add("border-green-200");
-        element.children[1].classList.remove("no-underline");
-        element.children[1].classList.toggle("line-through");
-        element.children[1].classList.toggle("decoration-1");
       } else {
         element.children[0].children[0].classList.remove("bg-green-700");
         element.children[0].children[0].classList.remove("border-green-200");
-        element.children[1].classList.remove("line-through");
-        element.children[1].classList.remove("decoration-1");
       }
+
+      element.children[1].classList.toggle("no-underline");
+      element.children[1].classList.toggle("line-through");
 
       if (state) {
         state = false;
