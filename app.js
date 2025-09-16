@@ -69,6 +69,7 @@ h1.textContent = currentDay;
 
 //day handling
 function change(event) {
+  today = event;
   const lists = document.querySelectorAll("li");
   lists.forEach((list) => {
     list.classList.remove("underline", "snap-center");
@@ -82,9 +83,23 @@ function change(event) {
         { weekday: window.screen.width < "768" ? "short" : "long" }
       );
       h1.textContent = currentDay;
-      today = event;
+      
     }
   });
+
+  console.log(today)
+  
+  todoLists.map(list => {
+    if(list.day === today) {
+      fetchList()
+    }else {
+      displayNone()
+    }
+  })
+}
+
+function displayNone() {
+  console.log("displaying none")
 }
 
 //displaying days
@@ -210,8 +225,6 @@ addItem.addEventListener("click", () => {
   inp.value = "";
   time.textContent = "time";
   todoLists.push(newObj);
-  
-  
 
   // let div = document.createElement("div");
 
@@ -261,7 +274,7 @@ addItem.addEventListener("click", () => {
 
   todoContainer.replaceChildren();
   fetchList();
-  
+
   timeDisplay = "";
 });
 
@@ -275,15 +288,20 @@ function handleCheckBox(element) {
 }
 
 function fetchList() {
-  let getLists = JSON.parse(localStorage.getItem("todo"));
-  if (getLists) {
-    todoLists = getLists ? getLists : todoLists;
+  let getLists = JSON.parse(localStorage.getItem("todo"))
+  
+  todoLists = getLists ? getLists : todoLists
 
-    todoLists.map((list) => {
-      let div = document.createElement("div");
-      const emoji = emojis.map((emoji) => {
-        if (list.todo?.toLowerCase().includes(emoji)) {
-          div.innerHTML = `<div
+  displayList()
+ 
+}
+
+function displayList() {
+  todoLists.map((list) => {
+    let div = document.createElement("div");
+    const emoji = emojis.map((emoji) => {
+      if (list.todo?.toLowerCase().includes(emoji)) {
+        div.innerHTML = `<div
           class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
         >
           <div class="flex md:gap-5 gap-3 items-center cursor-pointer" data-index-number="${list.id}" onclick="handleCheckBox(this)">
@@ -296,14 +314,14 @@ function fetchList() {
           </div>
         </div>`;
 
-          return true;
-        }
+        return true;
+      }
 
-        return false;
-      });
+      return false;
+    });
 
-      if (!emoji.some((element) => element === true)) {
-        div.innerHTML = `<div
+    if (!emoji.some((element) => element === true)) {
+      div.innerHTML = `<div
           class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
         >
           <div class="flex md:gap-5 gap-3 items-center cursor-pointer" data-index-number="${list.id}" onclick="handleCheckBox(this)">
@@ -317,13 +335,13 @@ function fetchList() {
             <button class="md:text-2xl opacity-40 font-mono" data-index-number="${list.id}" onclick="handleDelete(this)" ><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></button>
           </div>
         </div>`;
-      }
+    }
 
-      if (todoLists) {
-        todoContainer.appendChild(div);
-      }
-    });
-  }
+    if (list.day === today) {
+      console.log(list);
+    }
+    if (todoLists) todoContainer.appendChild(div);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", fetchList());
