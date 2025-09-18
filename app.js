@@ -33,6 +33,7 @@ let timeHour,
 let date = new Date();
 let currentMonth = date.toLocaleString("default", { month: "numeric" });
 
+
 let noOfDays = new Date(date.getFullYear(), 0, 0).getDate();
 let today = date.getDate();
 let monthInNum = new Date().toLocaleString("default", {
@@ -67,6 +68,8 @@ for (let i = 1; i <= 59; i++) {
 // displaying day in words
 h1.textContent = currentDay;
 
+localStorage.setItem("month", monthInNum)
+
 //day handling
 function change(event) {
   today = event;
@@ -86,19 +89,10 @@ function change(event) {
     }
   });
 
-  console.log(today);
+  todoLists.splice(0)
+  todoContainer.replaceChildren()
+  fetchList()
 
-  todoLists.map((list) => {
-    if (list.day === today) {
-      fetchList();
-    } else {
-      displayNone();
-    }
-  });
-}
-
-function displayNone() {
-  console.log("displaying none");
 }
 
 //displaying days
@@ -214,6 +208,15 @@ time.addEventListener("click", () => {
   timeContainer.classList.toggle("hidden");
 });
 
+
+
+(function getMonth() {
+  let getMonth = localStorage.getItem("month");
+  if(getMonth != monthInNum) {
+    localStorage.clear();
+  }
+})()
+
 addItem.addEventListener("click", () => {
   newObj = {
     id: Math.random(),
@@ -226,54 +229,13 @@ addItem.addEventListener("click", () => {
   time.textContent = "time";
   todoLists.push(newObj);
 
-  // let div = document.createElement("div");
 
-  // const emoji = emojis.map((emoji) => {
-  //   if (newObj.todo.toLowerCase().includes(emoji)) {
-  //     console.log(emoji);
-  //     div.innerHTML = `<div
-  //         class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
-  //       >
-  //         <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
-  //           <img src="assets/${emoji}.png" alt="" class="w-7" />
-  //           <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
-  //         </div>
-
-  //         <div class="flex gap-3 items-center">
-  //           <p class="md:text-2xl opacity-40 font-mono" onclick="handleDelete(this)" value="${newObj.todo}"><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></p>
-  //         </div>
-  //       </div>`;
-
-  //     return true;
-  //   }
-
-  //   return false;
-  // });
-
-  // if (!emoji.some((element) => element === true)) {
-  //   div.innerHTML = `<div
-  //         class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
-  //       >
-  //         <div class="flex md:gap-5 gap-3 items-center" onclick="handleCheckBox(this)">
-  //         <div class="w-7 flex justify-center">
-  //           <button class="w-5 h-5 border-1 rounded-sm border-gray-300" value="${newObj.todo}" ></button>
-  //            </div>
-  //           <p class="text-xl md:text-2xl font-mono">${newObj.todo}</p>
-
-  //         </div>
-
-  //         <div class="flex gap-3 items-center">
-  //           <p class="md:text-2xl opacity-40 font-mono" onclick="handleDelete(this)" value="${newObj.todo}"><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></p>
-  //         </div>
-  //       </div>`;
-  // }
 
   if (newObj.todo) {
-    localStorage.setItem("todo", JSON.stringify(todoLists));
+    localStorage.setItem(`day${today}`, JSON.stringify(todoLists));
+    todoContainer.replaceChildren()
+    fetchList()
   }
-
-  todoContainer.replaceChildren();
-  fetchList();
 
   timeDisplay = "";
 });
@@ -283,17 +245,7 @@ function handleCheckBox(element) {
     if (list.id == element.dataset.indexNumber) {
       let state = list.isComplete;
 
-      if (!state && element.children[0].children[0]?.tagName === "BUTTON") {
-        element.children[0].children[0].classList.remove("bg-white");
-        element.children[0].children[0].classList.add("bg-green-700");
-        element.children[0].children[0].classList.add("border-green-200");
-      } else {
-        element.children[0].children[0].classList.remove("bg-green-700");
-        element.children[0].children[0].classList.remove("border-green-200");
-      }
 
-      element.children[1].classList.toggle("no-underline");
-      element.children[1].classList.toggle("line-through");
 
       if (state) {
         state = false;
@@ -311,19 +263,16 @@ function handleCheckBox(element) {
 }
 
 function updateLocalStorage(value) {
-  localStorage.setItem("todo", JSON.stringify(value));
+  localStorage.setItem(`day${today}`, JSON.stringify(value));
 }
 
 function fetchList() {
-  let getLists = JSON.parse(localStorage.getItem("todo"));
-
+  let getLists = JSON.parse(localStorage.getItem(`day${today}`));
   todoLists = getLists ? getLists : todoLists;
-
   displayList();
 }
 
 function displayList() {
-  console.log(todoLists);
   todoLists.map((list) => {
     let div = document.createElement("div");
     const emoji = emojis.map((emoji) => {
@@ -333,11 +282,7 @@ function displayList() {
         >
           <div class="flex md:gap-5 gap-3 items-center cursor-pointer" data-index-number="${list.id}" onclick="handleCheckBox(this)">
             <img src="assets/${emoji}.png" alt="" class="w-7" />
-            <p class="text-xl md:text-2xl font-mono">${list.todo}</p>
-          </div>
-
-          <div class="flex gap-3 items-center">
-            <button class="md:text-2xl opacity-40 font-mono" data-index-number="${list.id}" onclick="handleDelete(this)" ><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></button>
+            <p class="text-xl md:text-2xl">${list.todo}</p>
           </div>
         </div>`;
 
@@ -361,13 +306,7 @@ function displayList() {
             </div>
             <p class="text-xl md:text-2xl ${
               list.isComplete ? `line-through` : `no-underline`
-            } font-mono">${list.todo}</p>
-          </div>
-
-          <div class="flex gap-3 items-center">
-            <button class="md:text-2xl opacity-40 font-mono" data-index-number="${
-              list.id
-            }" onclick="handleDelete(this)" ><img src="assets/delete.svg" alt="" class="w-7 fill-black" /></button>
+            } ">${list.todo}</p>
           </div>
         </div>`;
     }
@@ -380,14 +319,14 @@ function displayList() {
 
 document.addEventListener("DOMContentLoaded", fetchList());
 
-function handleDelete(element) {
-  let newLists = todoLists.filter((li) => li.id != element.dataset.indexNumber);
-  if (newLists.length >= 0) {
-    localStorage.setItem("todo", JSON.stringify(newLists));
-  } else {
-    localStorage.removeItem("todo");
-  }
+  // function handleDelete(element) {
+  //   let newLists = todoLists.filter((li) => li.id != element.dataset.indexNumber);
+  //   if (newLists.length >= 0) {
+  //     localStorage.setItem("todo", JSON.stringify(newLists));
+  //   } else {
+  //     localStorage.removeItem("todo");
+  //   }
 
-  todoContainer.replaceChildren();
-  fetchList();
-}
+  //   todoContainer.replaceChildren();
+  //   fetchList();
+  // }
