@@ -13,7 +13,16 @@ const addItem = document.getElementById("add-item");
 const todoContainer = document.getElementById("todo-container");
 const emojiBox = document.getElementById("emoji-box");
 
-let emojis = ["fruit", "vegetables", "wake", "sleep", "meat", "drink", "wake"];
+let emojis = [
+  "fruit",
+  "vegetables",
+  "wake",
+  "sleep",
+  "meat",
+  "drink",
+  "wake",
+  "meeting",
+];
 
 // for dates
 
@@ -22,6 +31,7 @@ let hours = [];
 let minutes = [];
 let periods = ["AM", "PM"];
 let todoLists = [];
+let completeLists = [];
 let newObj = {};
 let state = true;
 
@@ -32,7 +42,6 @@ let timeHour,
 
 let date = new Date();
 let currentMonth = date.toLocaleString("default", { month: "numeric" });
-
 
 let noOfDays = new Date(date.getFullYear(), 0, 0).getDate();
 let today = date.getDate();
@@ -60,7 +69,7 @@ for (let i = 1; i <= 12; i++) {
   hours.push(i);
 }
 
-for (let i = 1; i <= 59; i++) {
+for (let i = 0; i <= 59; i++) {
   const formattedMinute = String(i).padStart(2, "0");
   minutes.push(formattedMinute);
 }
@@ -68,7 +77,7 @@ for (let i = 1; i <= 59; i++) {
 // displaying day in words
 h1.textContent = currentDay;
 
-localStorage.setItem("month", monthInNum)
+localStorage.setItem("month", monthInNum);
 
 //day handling
 function change(event) {
@@ -89,10 +98,9 @@ function change(event) {
     }
   });
 
-  todoLists.splice(0)
-  todoContainer.replaceChildren()
-  fetchList()
-
+  todoLists.splice(0);
+  todoContainer.replaceChildren();
+  fetchList();
 }
 
 //displaying days
@@ -208,14 +216,12 @@ time.addEventListener("click", () => {
   timeContainer.classList.toggle("hidden");
 });
 
-
-
 (function getMonth() {
   let getMonth = localStorage.getItem("month");
-  if(getMonth != monthInNum) {
+  if (getMonth != monthInNum) {
     localStorage.clear();
   }
-})()
+})();
 
 addItem.addEventListener("click", () => {
   newObj = {
@@ -229,23 +235,32 @@ addItem.addEventListener("click", () => {
   time.textContent = "time";
   todoLists.push(newObj);
 
-
-
   if (newObj.todo) {
     localStorage.setItem(`day${today}`, JSON.stringify(todoLists));
-    todoContainer.replaceChildren()
-    fetchList()
+    todoContainer.replaceChildren();
+    fetchList();
   }
 
   timeDisplay = "";
 });
 
 function handleCheckBox(element) {
-  let newLists = todoLists.map((list) => {
+  let newLists = todoLists.map((list, index) => {
     if (list.id == element.dataset.indexNumber) {
       let state = list.isComplete;
 
-
+      if (element.firstElementChild.tagName == "IMG") {
+        element.lastElementChild.classList.toggle("line-through")
+      } else {
+        element.lastElementChild.classList.remove("no-underline");
+        element.lastElementChild.classList.toggle("line-through");
+        element.firstElementChild.firstElementChild.classList.remove(
+          "bg-white"
+        );
+        element.firstElementChild.firstElementChild.classList.toggle(
+          "bg-green-700"
+        );
+      }
 
       if (state) {
         state = false;
@@ -254,11 +269,13 @@ function handleCheckBox(element) {
       }
       return { ...list, isComplete: state };
     }
+
     return list;
   });
 
+console.log(todoLists)
   updateLocalStorage(newLists);
-  let getLists = JSON.parse(localStorage.getItem("todo"));
+  let getLists = JSON.parse(localStorage.getItem(`day${today}`));
   todoLists = getLists ? getLists : todoLists;
 }
 
@@ -276,14 +293,15 @@ function displayList() {
   todoLists.map((list) => {
     let div = document.createElement("div");
     const emoji = emojis.map((emoji) => {
-      if (list.todo?.toLowerCase().includes(emoji)) {
+      if (list.todo.toLowerCase().includes(emoji)) {
         div.innerHTML = `<div
           class="flex gap-5 items-center justify-between py-5 border-b-[4px] border-dashed border-gray-200"
         >
           <div class="flex md:gap-5 gap-3 items-center cursor-pointer" data-index-number="${list.id}" onclick="handleCheckBox(this)">
             <img src="assets/${emoji}.png" alt="" class="w-7" />
-            <p class="text-xl md:text-2xl">${list.todo}</p>
+            <p class="text-xl ${list.isComplete && "line-through"} md:text-2xl">${list.todo}</p>
           </div>
+          <div class="font-mono text-xl opacity-40">${list.time}</div>
         </div>`;
 
         return true;
@@ -308,6 +326,7 @@ function displayList() {
               list.isComplete ? `line-through` : `no-underline`
             } ">${list.todo}</p>
           </div>
+          <div class="font-mono text-xl opacity-40">${list.time}</div>
         </div>`;
     }
 
@@ -319,14 +338,14 @@ function displayList() {
 
 document.addEventListener("DOMContentLoaded", fetchList());
 
-  // function handleDelete(element) {
-  //   let newLists = todoLists.filter((li) => li.id != element.dataset.indexNumber);
-  //   if (newLists.length >= 0) {
-  //     localStorage.setItem("todo", JSON.stringify(newLists));
-  //   } else {
-  //     localStorage.removeItem("todo");
-  //   }
+// function handleDelete(element) {
+//   let newLists = todoLists.filter((li) => li.id != element.dataset.indexNumber);
+//   if (newLists.length >= 0) {
+//     localStorage.setItem("todo", JSON.stringify(newLists));
+//   } else {
+//     localStorage.removeItem("todo");
+//   }
 
-  //   todoContainer.replaceChildren();
-  //   fetchList();
-  // }
+//   todoContainer.replaceChildren();
+//   fetchList();
+// }
