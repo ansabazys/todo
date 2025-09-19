@@ -301,7 +301,7 @@ function displayList() {
             <img src="assets/${emoji}.png" alt="" class="w-7" />
             <p class="text-xl ${list.isComplete && "line-through"} md:text-2xl">${list.todo}</p>
           </div>
-          <div class="font-mono text-xl opacity-40">${list.time}</div>
+          <button class="font-mono text-xl text-gray-300 cursor-pointer hover:text-red-900" data-index-number=${list.id} onclick="handleDelete(this)">del</button>
         </div>`;
 
         return true;
@@ -326,7 +326,7 @@ function displayList() {
               list.isComplete ? `line-through` : `no-underline`
             } ">${list.todo}</p>
           </div>
-          <div class="font-mono text-xl opacity-40">${list.time}</div>
+          <button class="font-mono text-xl text-gray-300 cursor-pointer hover:text-red-900" data-index-number=${list.id} onclick="handleDelete(this)">del</button>
         </div>`;
     }
 
@@ -338,14 +338,13 @@ function displayList() {
 
 document.addEventListener("DOMContentLoaded", fetchList());
 
-// function handleDelete(element) {
-//   let newLists = todoLists.filter((li) => li.id != element.dataset.indexNumber);
-//   if (newLists.length >= 0) {
-//     localStorage.setItem("todo", JSON.stringify(newLists));
-//   } else {
-//     localStorage.removeItem("todo");
-//   }
+function handleDelete(element) {
+  let newLists = todoLists.filter((li) => li.id != element.dataset.indexNumber);
+  console.log(element)
+  if (newLists.length >= 0) {
+    localStorage.setItem(`day${today}`, JSON.stringify(newLists));
+  }
 
-//   todoContainer.replaceChildren();
-//   fetchList();
-// }
+  todoContainer.replaceChildren();
+  fetchList();
+}
